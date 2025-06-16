@@ -13,7 +13,7 @@ const index = (req, res) => {
 
 const show = (req, res) => {
   const sql = "SELECT * FROM movies WHERE id = ?";
-  const reviewSql = "SELECT * FROM reviews WHERE id = ?";
+
   const { id } = req.params;
   connection.query(sql, [id], (err, results) => {
     if (err)
@@ -26,19 +26,19 @@ const show = (req, res) => {
       });
 
     const movie = results[0];
-
-    connection.query(reviewSql, [id], (err, results) => {
+    const reviewSql = `SELECT * FROM reviews WHERE movie_id = ?`;
+    connection.query(reviewSql, [movie.id], (err, reviewResults) => {
       if (err)
         return res.status(500).json({
           error: "invalid request",
         });
-      if (results.length === 0)
+      if (reviewResults.length === 0)
         return res.status(404).json({
           error: "Film non trovato",
         });
       res.json({
         movie,
-        reviews: results[0],
+        reviews: reviewResults,
       });
     });
   });
