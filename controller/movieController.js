@@ -44,4 +44,25 @@ const show = (req, res) => {
   });
 };
 
-module.exports = { index, show };
+const store = (req, res) => {
+  const { id } = req.params;
+  const { name, vote, text, movie_id } = req.body;
+
+  const sqlAddReview =
+    "INSERT INTO `movies`.`reviews` ( `name`, `vote`, `text` ,`movie_id`) VALUES ( ?, ?, ?,?);";
+
+  connection.query(
+    sqlAddReview,
+    [name, vote, text, movie_id],
+    (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: "Errore nel salvataggio" });
+      }
+      res.status(201).json({
+        message: "Recensione aggiunta con successo",
+        review: { name, vote, text, movie_id: id },
+      });
+    }
+  );
+};
+module.exports = { index, show, store };
